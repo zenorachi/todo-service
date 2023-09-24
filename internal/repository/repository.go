@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/zenorachi/todo-service/internal/entity"
 )
@@ -25,6 +26,7 @@ type (
 		DeleteByID(ctx context.Context, id int) error
 		DeleteByUserID(ctx context.Context, userId int) error
 		GetByUserID(ctx context.Context, userId int) ([]entity.Task, error)
+		GetByDateAndStatus(ctx context.Context, userId int, status string, date time.Time, limit, offset int) ([]entity.Task, error)
 	}
 )
 

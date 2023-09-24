@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+const dateFormat = "2006-Jan-02"
+
 func (h *Handler) initAgendaRoutes(api *gin.RouterGroup) {
 	agenda := api.Group("/agenda", h.userIdentity)
 	{
@@ -19,6 +21,7 @@ func (h *Handler) initAgendaRoutes(api *gin.RouterGroup) {
 		agenda.DELETE("/delete_by_id", h.deleteTaskByID)
 		agenda.DELETE("/delete_all", h.deleteUserTasks)
 		agenda.GET("/get_all", h.getUserTasks)
+		agenda.GET("/get_by_date", h.getTasksByDataAndStatus)
 	}
 }
 
@@ -27,7 +30,7 @@ func (h *Handler) initAgendaRoutes(api *gin.RouterGroup) {
 type createTaskInput struct {
 	Title       string `json:"title"    binding:"required,min=2,max=64"`
 	Description string `json:"description"`
-	Data        string `json:"data" binding:"required,min=6,max=64"`
+	Date        string `json:"date" binding:"required,min=6,max=64"`
 	Status      string `json:"status"`
 }
 
@@ -53,7 +56,7 @@ func (h *Handler) createTask(c *gin.Context) {
 		return
 	}
 
-	data, err := time.Parse("2006-Jan-02", input.Data)
+	date, err := time.Parse(dateFormat, input.Date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, entity.ErrInvalidData.Error())
 		return
@@ -63,7 +66,7 @@ func (h *Handler) createTask(c *gin.Context) {
 		UserID:      c.GetInt(userCtx),
 		Title:       input.Title,
 		Description: input.Description,
-		Data:        data,
+		Date:        date,
 		Status:      input.Status,
 	})
 
@@ -226,6 +229,59 @@ type getAllUserTasksResponse struct {
 // @Router /api/v1/agenda/get_all [get]
 func (h *Handler) getUserTasks(c *gin.Context) {
 	tasks, err := h.services.Agenda.GetUserTasks(c, c.GetInt(userCtx))
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	newResponse(c, http.StatusOK, getAllUserTasksResponse{Tasks: tasks})
+}
+
+/* --- GET ALL USER TASKS BY DATE --- */
+
+type getAllUserTasksByDataInput struct {
+	Date   string `json:"date"`
+	Limit  int    `json:"limit"  binding:"required,min=1"`
+	Offset int    `json:"offset" binding:"required,min=1"`
+}
+
+// @Summary Get All User Tasks
+// @Security Bearer
+// @Description getting all user tasks by user id and date or status (also support pagination)
+// @Tags agenda
+// @Accept json
+// @Produce json
+// @Param input body getAllUserTasksByDataInput true "input"
+// @Success 200 {object} getAllUserTasksResponse
+// @Failure 500 {object} errorResponse
+// @Router /api/v1/agenda/get_by_date [get]
+func (h *Handler) getTasksByDataAndStatus(c *gin.Context) {
+	var input getAllUserTasksByDataInput
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, entity.ErrInvalidInput.Error())
+		return
+	}
+
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, entity.ErrInvalidPaginationSizes.Error())
+		return
+	}
+
+	var (
+		date   = time.Time{}
+		status = c.DefaultQuery("status", "not done")
+	)
+
+	if len(input.Date) != 0 {
+		date, err = time.Parse(dateFormat, input.Date)
+		if err != nil {
+			newErrorResponse(c, http.StatusBadRequest, entity.ErrInvalidData.Error())
+			return
+		}
+	}
+
+	tasks, err := h.services.Agenda.GetByDateAndStatus(c, c.GetInt(userCtx), status, date, input.Limit, (page-1)*input.Offset)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

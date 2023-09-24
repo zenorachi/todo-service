@@ -6,5 +6,5 @@ http:
   shutdownTimeout: 5s
 
 auth:
-  accessTokenTTL: 15m
+  accessTokenTTL: 1h
   refreshTokenTTL: 720h

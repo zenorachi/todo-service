@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/zenorachi/todo-service/internal/entity"
+	"time"
 )
 
 type AgendaRepository struct {
@@ -27,11 +28,11 @@ func (a *AgendaRepository) Create(ctx context.Context, task entity.Task) (int, e
 
 	var (
 		id    int
-		query = fmt.Sprintf("INSERT INTO %s (user_id, title, description, data, status) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+		query = fmt.Sprintf("INSERT INTO %s (user_id, title, description, date, status) VALUES ($1, $2, $3, $4, $5) RETURNING id",
 			collectionAgenda)
 	)
 
-	err = tx.QueryRowContext(ctx, query, task.UserID, task.Title, task.Description, task.Data, task.Status).Scan(&id)
+	err = tx.QueryRowContext(ctx, query, task.UserID, task.Title, task.Description, task.Date, task.Status).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -51,12 +52,12 @@ func (a *AgendaRepository) GetByID(ctx context.Context, id int) (entity.Task, er
 
 	var (
 		task  entity.Task
-		query = fmt.Sprintf("SELECT title, description, data, status FROM %s WHERE id = $1",
+		query = fmt.Sprintf("SELECT title, description, date, status FROM %s WHERE id = $1",
 			collectionAgenda)
 	)
 
 	err = tx.QueryRowContext(ctx, query, id).
-		Scan(&task.Title, &task.Description, &task.Data, &task.Status)
+		Scan(&task.Title, &task.Description, &task.Date, &task.Status)
 	if err != nil {
 		return entity.Task{}, err
 	}
@@ -76,12 +77,12 @@ func (a *AgendaRepository) GetByTitle(ctx context.Context, title string) (entity
 
 	var (
 		task  entity.Task
-		query = fmt.Sprintf("SELECT title, description, data, status FROM %s WHERE title = $1",
+		query = fmt.Sprintf("SELECT title, description, date, status FROM %s WHERE title = $1",
 			collectionAgenda)
 	)
 
 	err = tx.QueryRowContext(ctx, query, title).
-		Scan(&task.Title, &task.Description, &task.Data, &task.Status)
+		Scan(&task.Title, &task.Description, &task.Date, &task.Status)
 	if err != nil {
 		return entity.Task{}, err
 	}
@@ -162,7 +163,7 @@ func (a *AgendaRepository) GetByUserID(ctx context.Context, userId int) ([]entit
 
 	var (
 		tasks []entity.Task
-		query = fmt.Sprintf("SELECT title, description, data, status FROM %s WHERE user_id = $1",
+		query = fmt.Sprintf("SELECT title, description, date, status FROM %s WHERE user_id = $1",
 			collectionAgenda)
 	)
 
@@ -174,7 +175,55 @@ func (a *AgendaRepository) GetByUserID(ctx context.Context, userId int) ([]entit
 
 	for rows.Next() {
 		var task entity.Task
-		if err = rows.Scan(&task.Title, &task.Description, &task.Data, &task.Status); err != nil {
+		if err = rows.Scan(&task.Title, &task.Description, &task.Date, &task.Status); err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, task)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return tasks, tx.Commit()
+}
+
+func (a *AgendaRepository) GetByDateAndStatus(ctx context.Context, userId int, status string, date time.Time, limit, offset int) ([]entity.Task, error) {
+	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{
+		Isolation: sql.LevelRepeatableRead,
+		ReadOnly:  true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	var (
+		tasks []entity.Task
+		query string
+		rows  *sql.Rows
+	)
+
+	if date.Equal(time.Time{}) {
+		query = fmt.Sprintf(
+			"SELECT title, description, date, status FROM %s WHERE user_id = $1 AND status = $2 LIMIT $3 OFFSET $4",
+			collectionAgenda)
+		rows, err = tx.QueryContext(ctx, query, userId, status, limit, offset)
+	} else {
+		query = fmt.Sprintf(
+			"SELECT title, description, date, status FROM %s WHERE user_id = $1 AND status = $2 AND DATE(date) = $3 LIMIT $4 OFFSET $5",
+			collectionAgenda)
+		rows, err = tx.QueryContext(ctx, query, userId, status, date, limit, offset)
+	}
+	fmt.Println(query)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = rows.Close() }()
+
+	for rows.Next() {
+		var task entity.Task
+		if err = rows.Scan(&task.Title, &task.Description, &task.Date, &task.Status); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)

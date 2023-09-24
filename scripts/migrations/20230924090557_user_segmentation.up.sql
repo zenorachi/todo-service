@@ -25,7 +25,7 @@ CREATE TABLE agenda (
     user_id         INT NOT NULL,
     title           VARCHAR(255) NOT NULL,
     description     VARCHAR DEFAULT NULL,
-    data            TIMESTAMP NOT NULL,
+    date            TIMESTAMP NOT NULL,
     status          task_type DEFAULT 'not done',
     FOREIGN KEY (user_id) REFERENCES users (id)
 );

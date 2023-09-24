@@ -35,7 +35,7 @@ migrate-down:
 	migrate -path $(MIGRATION_DIR) -database $(POSTGRES_URL) down
 
 swag:
-	 swag init -g internal/app/app.go -o ./docs/swagger/
+	 swag init -g internal/app/app.go
 
 clean:
 	rm -rf ./.bin cover.out

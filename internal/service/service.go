@@ -15,6 +15,11 @@ type Tokens struct {
 	RefreshToken string
 }
 
+type LimitOffset struct {
+	Limit  int
+	Offset int
+}
+
 type (
 	Users interface {
 		SignUp(ctx context.Context, login, email, password string) (int, error)
@@ -22,7 +27,6 @@ type (
 		RefreshTokens(ctx context.Context, refreshToken string) (Tokens, error)
 	}
 
-	// todo: pagination & getbydata
 	Agenda interface {
 		CreateTask(ctx context.Context, task entity.Task) (int, error)
 		GetTaskByID(ctx context.Context, id int) (entity.Task, error)
@@ -30,6 +34,7 @@ type (
 		DeleteTaskByID(ctx context.Context, id int) error
 		DeleteUserTasks(ctx context.Context, userId int) error
 		GetUserTasks(ctx context.Context, userId int) ([]entity.Task, error)
+		GetByDateAndStatus(ctx context.Context, userId int, status string, date time.Time, limit, offset int) ([]entity.Task, error)
 	}
 )
 
