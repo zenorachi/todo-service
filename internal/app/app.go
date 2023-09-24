@@ -3,8 +3,13 @@ package app
 import (
 	"github.com/zenorachi/todo-service/internal/config"
 	"github.com/zenorachi/todo-service/internal/database"
+	"github.com/zenorachi/todo-service/internal/repository"
 	"github.com/zenorachi/todo-service/internal/server"
+	"github.com/zenorachi/todo-service/internal/service"
+	"github.com/zenorachi/todo-service/internal/transport"
+	"github.com/zenorachi/todo-service/pkg/auth"
 	"github.com/zenorachi/todo-service/pkg/database/postgres"
+	"github.com/zenorachi/todo-service/pkg/hash"
 	"github.com/zenorachi/todo-service/pkg/logger"
 	"os"
 	"os/signal"
@@ -28,14 +33,22 @@ func Run(cfg *config.Config) {
 	logger.Info("database", "postgres connected")
 
 	/* INIT TOKEN MANAGER */
-	//tokenManager := auth.NewManager(cfg.Auth.Secret)
+	tokenManager := auth.NewManager(cfg.Auth.Secret)
 
 	/* INIT SERVICES & DEPS */
+	services := service.New(service.Deps{
+		Repos:           repository.New(db),
+		Hasher:          hash.NewSHA1Hasher(cfg.Auth.Salt),
+		TokenManager:    tokenManager,
+		AccessTokenTTL:  cfg.Auth.AccessTokenTTL,
+		RefreshTokenTTL: cfg.Auth.RefreshTokenTTL,
+	})
 
 	/* INIT HTTP HANDLER */
+	handler := transport.NewHandler(services, tokenManager)
 
 	/* INIT HTTP SERVER */
-	srv := server.New(cfg, nil)
+	srv := server.New(cfg, handler.InitRoutes())
 	srv.Run()
 	logger.Info("server", "http server started")
 
