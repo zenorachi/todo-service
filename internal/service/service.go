@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/zenorachi/todo-service/internal/entity"
 	"time"
 
 	"github.com/zenorachi/todo-service/internal/repository"
@@ -20,10 +21,20 @@ type (
 		SignIn(ctx context.Context, login, password string) (Tokens, error)
 		RefreshTokens(ctx context.Context, refreshToken string) (Tokens, error)
 	}
+
+	Agenda interface {
+		CreateTask(ctx context.Context, task entity.Task) (int, error)
+		GetTaskByID(ctx context.Context, id int) (entity.Task, error)
+		SetTaskStatus(ctx context.Context, id int, status string) error
+		DeleteTaskByID(ctx context.Context, id int) error
+		DeleteUserTasks(ctx context.Context, userId int) error
+		GetUserTasks(ctx context.Context, userId int) ([]entity.Task, error)
+	}
 )
 
 type Services struct {
 	Users
+	Agenda
 }
 
 type Deps struct {
@@ -36,6 +47,7 @@ type Deps struct {
 
 func New(deps Deps) *Services {
 	return &Services{
-		Users: NewUsers(deps.Repos.Users, deps.Hasher, deps.TokenManager, deps.AccessTokenTTL, deps.RefreshTokenTTL),
+		Users:  NewUsers(deps.Repos.Users, deps.Hasher, deps.TokenManager, deps.AccessTokenTTL, deps.RefreshTokenTTL),
+		Agenda: NewAgenda(deps.Repos.Agenda),
 	}
 }

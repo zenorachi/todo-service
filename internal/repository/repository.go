@@ -16,14 +16,25 @@ type (
 		GetByRefreshToken(ctx context.Context, refreshToken string) (entity.User, error)
 		SetSession(ctx context.Context, userId int, session entity.Session) error
 	}
+
+	Agenda interface {
+		Create(ctx context.Context, task entity.Task) (int, error)
+		GetByID(ctx context.Context, id int) (entity.Task, error)
+		SetStatus(ctx context.Context, id int, status string) error
+		DeleteByID(ctx context.Context, id int) error
+		DeleteByUserID(ctx context.Context, userId int) error
+		GetByUserID(ctx context.Context, userId int) ([]entity.Task, error)
+	}
 )
 
 type Repositories struct {
 	Users
+	Agenda
 }
 
 func New(db *sql.DB) *Repositories {
 	return &Repositories{
-		Users: NewUsers(db),
+		Users:  NewUsers(db),
+		Agenda: NewAgenda(db),
 	}
 }
