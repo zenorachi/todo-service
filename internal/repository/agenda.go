@@ -64,6 +64,31 @@ func (a *AgendaRepository) GetByID(ctx context.Context, id int) (entity.Task, er
 	return task, tx.Commit()
 }
 
+func (a *AgendaRepository) GetByTitle(ctx context.Context, title string) (entity.Task, error) {
+	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{
+		Isolation: sql.LevelRepeatableRead,
+		ReadOnly:  true,
+	})
+	if err != nil {
+		return entity.Task{}, err
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	var (
+		task  entity.Task
+		query = fmt.Sprintf("SELECT title, description, data, status FROM %s WHERE title = $1",
+			collectionAgenda)
+	)
+
+	err = tx.QueryRowContext(ctx, query, title).
+		Scan(&task.Title, &task.Description, &task.Data, &task.Status)
+	if err != nil {
+		return entity.Task{}, err
+	}
+
+	return task, tx.Commit()
+}
+
 func (a *AgendaRepository) SetStatus(ctx context.Context, id int, status string) error {
 	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelSerializable,

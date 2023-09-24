@@ -34,8 +34,7 @@ import (
 
 func Run(cfg *config.Config) {
 	/* DO MIGRATIONS */
-	err := database.DoMigrations(&cfg.DB)
-	if err != nil {
+	if database.DoMigrations(&cfg.DB) != nil {
 		logger.Fatal("migrations", "migrations failed")
 	}
 	logger.Info("migrations", "migrations done")
@@ -63,7 +62,7 @@ func Run(cfg *config.Config) {
 	/* INIT HTTP HANDLER */
 	handler := transport.NewHandler(services, tokenManager)
 
-	/* INIT HTTP SERVER */
+	/* INIT & RUN HTTP SERVER */
 	srv := server.New(cfg, handler.InitRoutes())
 	srv.Run()
 	logger.Info("server", "http server started")
@@ -82,8 +81,7 @@ func Run(cfg *config.Config) {
 
 	/* SHUTTING DOWN */
 	logger.Info("Shutting down...")
-	err = srv.Shutdown()
-	if err != nil {
+	if srv.Shutdown() != nil {
 		logger.Error("server", err.Error())
 	}
 }

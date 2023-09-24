@@ -10,4 +10,6 @@ var (
 	ErrUserDoesNotExist    = errors.New("user does not exist")
 	ErrIncorrectPassword   = errors.New("incorrect password")
 	ErrSessionDoesNotExist = errors.New("session does not exist")
+	ErrTaskAlreadyExist    = errors.New("task already exist")
+	ErrTaskDoesNotExist    = errors.New("task does not exist")
 )
