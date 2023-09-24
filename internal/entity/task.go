@@ -8,6 +8,7 @@ const (
 )
 
 type Task struct {
+	UserID      int       `json:"user_id,omitempty"`
 	Title       string    `json:"title,omitempty"`
 	Description string    `json:"description,omitempty"`
 	Data        time.Time `json:"data,omitempty"`

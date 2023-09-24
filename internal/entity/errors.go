@@ -12,4 +12,6 @@ var (
 	ErrSessionDoesNotExist = errors.New("session does not exist")
 	ErrTaskAlreadyExist    = errors.New("task already exist")
 	ErrTaskDoesNotExist    = errors.New("task does not exist")
+	ErrInvalidStatus       = errors.New("invalid status (status should be 'done' or 'not done'")
+	ErrInvalidData         = errors.New("invalid data (should be like `2006-Jan-02`")
 )

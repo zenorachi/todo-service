@@ -27,11 +27,11 @@ func (a *AgendaRepository) Create(ctx context.Context, task entity.Task) (int, e
 
 	var (
 		id    int
-		query = fmt.Sprintf("INSERT INTO %s (title, description, data, status) VALUES ($1, $2, $3, $4) RETURNING id",
+		query = fmt.Sprintf("INSERT INTO %s (user_id, title, description, data, status) VALUES ($1, $2, $3, $4, $5) RETURNING id",
 			collectionAgenda)
 	)
 
-	err = tx.QueryRowContext(ctx, query, task.Title, task.Description, task.Data, task.Status).Scan(&id)
+	err = tx.QueryRowContext(ctx, query, task.UserID, task.Title, task.Description, task.Data, task.Status).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -162,7 +162,7 @@ func (a *AgendaRepository) GetByUserID(ctx context.Context, userId int) ([]entit
 
 	var (
 		tasks []entity.Task
-		query = fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1",
+		query = fmt.Sprintf("SELECT title, description, data, status FROM %s WHERE user_id = $1",
 			collectionAgenda)
 	)
 

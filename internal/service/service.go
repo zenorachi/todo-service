@@ -22,6 +22,7 @@ type (
 		RefreshTokens(ctx context.Context, refreshToken string) (Tokens, error)
 	}
 
+	// todo: pagination & getbydata
 	Agenda interface {
 		CreateTask(ctx context.Context, task entity.Task) (int, error)
 		GetTaskByID(ctx context.Context, id int) (entity.Task, error)

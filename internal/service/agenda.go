@@ -9,11 +9,11 @@ import (
 )
 
 type AgendaService struct {
-	repo repository.Agenda
+	agendaRepo repository.Agenda
 }
 
-func NewAgenda(repo repository.Agenda) *AgendaService {
-	return &AgendaService{repo: repo}
+func NewAgenda(agendaRepo repository.Agenda) *AgendaService {
+	return &AgendaService{agendaRepo: agendaRepo}
 }
 
 func (a *AgendaService) CreateTask(ctx context.Context, task entity.Task) (int, error) {
@@ -21,11 +21,19 @@ func (a *AgendaService) CreateTask(ctx context.Context, task entity.Task) (int, 
 		return 0, entity.ErrTaskAlreadyExist
 	}
 
-	return a.repo.Create(ctx, task)
+	if len(task.Status) != 0 && task.Status != entity.StatusDone && task.Status != entity.StatusNotDone {
+		return 0, entity.ErrInvalidStatus
+	}
+
+	if len(task.Status) == 0 {
+		task.Status = entity.StatusNotDone
+	}
+
+	return a.agendaRepo.Create(ctx, task)
 }
 
 func (a *AgendaService) GetTaskByID(ctx context.Context, id int) (entity.Task, error) {
-	task, err := a.repo.GetByID(ctx, id)
+	task, err := a.agendaRepo.GetByID(ctx, id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return entity.Task{}, entity.ErrTaskDoesNotExist
 	}
@@ -41,7 +49,11 @@ func (a *AgendaService) SetTaskStatus(ctx context.Context, id int, status string
 		return entity.ErrTaskDoesNotExist
 	}
 
-	return a.repo.SetStatus(ctx, id, status)
+	if status != entity.StatusDone && status != entity.StatusNotDone {
+		return entity.ErrInvalidStatus
+	}
+
+	return a.agendaRepo.SetStatus(ctx, id, status)
 }
 
 func (a *AgendaService) DeleteTaskByID(ctx context.Context, id int) error {
@@ -49,15 +61,15 @@ func (a *AgendaService) DeleteTaskByID(ctx context.Context, id int) error {
 		return entity.ErrTaskDoesNotExist
 	}
 
-	return a.repo.DeleteByID(ctx, id)
+	return a.agendaRepo.DeleteByID(ctx, id)
 }
 
 func (a *AgendaService) DeleteUserTasks(ctx context.Context, userId int) error {
-	return a.repo.DeleteByUserID(ctx, userId)
+	return a.agendaRepo.DeleteByUserID(ctx, userId)
 }
 
 func (a *AgendaService) GetUserTasks(ctx context.Context, userId int) ([]entity.Task, error) {
-	return a.repo.GetByUserID(ctx, userId)
+	return a.agendaRepo.GetByUserID(ctx, userId)
 }
 
 func (a *AgendaService) isTaskExists(ctx context.Context, data any) bool {
@@ -65,9 +77,9 @@ func (a *AgendaService) isTaskExists(ctx context.Context, data any) bool {
 
 	switch data.(type) {
 	case string:
-		task, _ = a.repo.GetByTitle(ctx, data.(string))
+		task, _ = a.agendaRepo.GetByTitle(ctx, data.(string))
 	case int:
-		task, _ = a.repo.GetByID(ctx, data.(int))
+		task, _ = a.agendaRepo.GetByID(ctx, data.(int))
 	}
 
 	return len(task.Title) != 0
