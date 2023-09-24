@@ -20,10 +20,11 @@ type Config struct {
 
 type (
 	HTTPConfig struct {
-		Host         string
-		Port         string
-		ReadTimeout  time.Duration
-		WriteTimeout time.Duration
+		Host            string
+		Port            string
+		ReadTimeout     time.Duration
+		WriteTimeout    time.Duration
+		ShutdownTimeout time.Duration
 	}
 
 	AuthConfig struct {
