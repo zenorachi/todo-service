@@ -1,6 +1,10 @@
 package app
 
 import (
+	"os"
+	"os/signal"
+	"syscall"
+
 	_ "github.com/zenorachi/todo-service/docs"
 	"github.com/zenorachi/todo-service/internal/config"
 	"github.com/zenorachi/todo-service/internal/database"
@@ -12,9 +16,6 @@ import (
 	"github.com/zenorachi/todo-service/pkg/database/postgres"
 	"github.com/zenorachi/todo-service/pkg/hash"
 	"github.com/zenorachi/todo-service/pkg/logger"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 // @title           			TO-DO service

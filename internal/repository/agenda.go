@@ -4,8 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/zenorachi/todo-service/internal/entity"
 	"time"
+
+	"github.com/zenorachi/todo-service/internal/entity"
 )
 
 type AgendaRepository struct {
@@ -215,7 +216,7 @@ func (a *AgendaRepository) GetByDateAndStatus(ctx context.Context, userId int, s
 			collectionAgenda)
 		rows, err = tx.QueryContext(ctx, query, userId, status, date, limit, offset)
 	}
-	fmt.Println(query)
+
 	if err != nil {
 		return nil, err
 	}

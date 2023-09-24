@@ -3,9 +3,10 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/zenorachi/todo-service/internal/config"
 	"net/http"
 	"time"
+
+	"github.com/zenorachi/todo-service/internal/config"
 )
 
 type Server struct {

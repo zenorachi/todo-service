@@ -2,12 +2,13 @@ package v1
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/zenorachi/todo-service/internal/entity"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/zenorachi/todo-service/internal/entity"
 )
 
 const dateFormat = "2006-Jan-02"

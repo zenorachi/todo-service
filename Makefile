@@ -34,10 +34,20 @@ migrate-up:
 migrate-down:
 	migrate -path $(MIGRATION_DIR) -database $(POSTGRES_URL) down
 
+test:
+	go test -coverprofile=cover.out -v ./...
+	make --silent test-coverage
+
+test-coverage:
+	go tool cover -func=cover.out | grep "total"
+
 swag:
 	 swag init -g internal/app/app.go
+
+lint:
+	golangci-lint run
 
 clean:
 	rm -rf ./.bin cover.out
 
-.PHONY: build run rebuild up-postgres stop migrate-create migrate-down migrate-up swag clean
+.PHONY: build run rebuild up-postgres stop migrate-create migrate-down migrate-up test test-coverage swag clean

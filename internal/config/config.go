@@ -1,11 +1,12 @@
 package config
 
 import (
+	"sync"
+	"time"
+
 	"github.com/joho/godotenv"
 	"github.com/zenorachi/todo-service/pkg/database/postgres"
 	"github.com/zenorachi/todo-service/pkg/logger"
-	"sync"
-	"time"
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/spf13/viper"

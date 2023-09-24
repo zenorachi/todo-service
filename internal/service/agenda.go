@@ -4,9 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
+
 	"github.com/zenorachi/todo-service/internal/entity"
 	"github.com/zenorachi/todo-service/internal/repository"
-	"time"
 )
 
 type AgendaService struct {

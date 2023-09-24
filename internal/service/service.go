@@ -2,8 +2,9 @@ package service
 
 import (
 	"context"
-	"github.com/zenorachi/todo-service/internal/entity"
 	"time"
+
+	"github.com/zenorachi/todo-service/internal/entity"
 
 	"github.com/zenorachi/todo-service/internal/repository"
 	"github.com/zenorachi/todo-service/pkg/auth"
