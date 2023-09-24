@@ -67,6 +67,11 @@ const docTemplate = `{
         },
         "/api/v1/agenda/create": {
             "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
                 "description": "create task",
                 "consumes": [
                     "application/json"
@@ -308,7 +313,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/users/refresh": {
+        "/api/v1/auth/refresh": {
             "get": {
                 "description": "refresh user's access token",
                 "produces": [
@@ -340,7 +345,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/users/sign-in": {
+        "/api/v1/auth/sign-in": {
             "post": {
                 "description": "user sign in",
                 "consumes": [
@@ -386,7 +391,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/users/sign-up": {
+        "/api/v1/auth/sign-up": {
             "post": {
                 "description": "create user account",
                 "consumes": [

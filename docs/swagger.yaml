@@ -195,6 +195,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/v1.errorResponse'
+      security:
+      - Bearer: []
       summary: Create task
       tags:
       - agenda
@@ -317,7 +319,7 @@ paths:
       summary: Update Task Status
       tags:
       - agenda
-  /api/v1/users/refresh:
+  /api/v1/auth/refresh:
     get:
       description: refresh user's access token
       produces:
@@ -338,7 +340,7 @@ paths:
       summary: User Refresh Token
       tags:
       - auth
-  /api/v1/users/sign-in:
+  /api/v1/auth/sign-in:
     post:
       consumes:
       - application/json
@@ -368,7 +370,7 @@ paths:
       summary: User SignIn
       tags:
       - auth
-  /api/v1/users/sign-up:
+  /api/v1/auth/sign-up:
     post:
       consumes:
       - application/json

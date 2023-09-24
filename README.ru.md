@@ -2,44 +2,44 @@
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 <div align="center">
-    <h1>TO-DO service</h1>
+    <h1>TO-DO сервис</h1>
     <h5>
-        A microservice written in the Go programming language is designed to plan your daily tasks.
+        Микросервис, написанный на Golang, предназначенный для планирования ваших ежедневных задач.
     </h5>
     <p>
-        English | <a href="README.ru.md">Russian</a> 
+        <a href="README.md">English</a> | Russian 
     </p>
 </div>
 
 ---
 
-## Technologies used:
+## Используемые технологии:
 - [Golang](https://go.dev), [PostgreSQL](https://www.postgresql.org/)
-- [Docker](https://www.docker.com/), [JWT Authentication](https://jwt.io/)
+- [Docker](https://www.docker.com/), [JWT Аутентификация](https://jwt.io/)
 - [REST](https://ru.wikipedia.org/wiki/REST), [Swagger UI](https://swagger.io/tools/swagger-ui/)
 
 ---
 
-## Navigation
-* **[Installation](#installation)**
-* **[Example of requests](#examples-of-requests)**
-  * [Users](#users)
-  * [Agenda](#agenda)
-* **[Additional features](#additional-features)**
+## Навигация
+* **[Загрузка](#Загрузка)**
+* **[Примеры запросов](#примеры-запросов)**
+    * [Пользователи](#пользователи)
+    * [TODO-лист](#todo-лист)
+* **[Дополнительные возможности](#дополнительные-возможности)**
 
 ---
 
-## Installation
+## Загрузка
 ```shell
 git clone git@github.com:zenorachi/todo-service.git
 ```
 
 ---
 
-## Getting started
-1. **Setting up environment variables (create a .env file in the project root):**
+## Начало работы
+1. **Настройка переменных окружения (создайте файл .env в корне проекта):**
 ```dotenv
-# Database
+# База данных
 export DB_HOST=
 export DB_PORT=
 export DB_USER=
@@ -47,38 +47,37 @@ export DB_NAME=
 export DB_SSLMODE=
 export DB_PASSWORD=
 
-# Local database
+# Локальная БД
 export LOCAL_DB_PORT=
 
-# Postgres service
+# Сервис postgres
 export POSTGRES_PASSWORD=
 
-# Password Hasher
+# Секреты для пароля
 export HASH_SALT=
 export HASH_SECRET=
 
-# GIN mode (optional, default - release)
+# GIN мод (необязательно, по умолчанию - release)
 export GIN_MODE=
 ```
-> **Hint:**
-if you are running the project using Docker, set `DB_HOST` to "**postgres**" (as the service name of Postgres in the docker-compose).
+> **Подсказка:** если вы запускаете проект с помощью Docker, установите `DB_HOST`=postgres (как имя сервиса Postgres в docker-compose).
 
-2. **Compile and run the project:**
+2. **Запуск сервиса:**
 ```shell
 make
 ```
-3. **To test the service's functionality, you can navigate to the address
-   http://localhost:8080/docs/index.html to access the Swagger documentation.**
-> **Hint:** to complete the authorization in Swagger UI after receiving the JWT token, you need
-to enter `Bearer <your_token>` (without "<" and ">" symbols) in the input field.
+3. **Чтобы протестировать работу сервиса, можно перейти по адресу
+   http://localhost:8080/docs/index.html для получения Swagger документации.**
+> **Подсказка:** чтобы пройти авторизацию в Swagger UI после получения JWT токена, в поле для ввода необходимо
+ввести `Bearer <полученный_токен>` (без символов "<" и ">").
 
 ---
 
-## Examples of requests
+## Примеры запросов
 
-### Users
-#### 1. Registration
-* Request example:
+### Пользователи
+#### 1. Регистрация
+* Пример запроса:
 ```shell
 curl -X 'POST' \
   'http://localhost:8080/api/v1/auth/sign-up' \
@@ -90,15 +89,15 @@ curl -X 'POST' \
   "password": "qwerty123"
 }'
 ```
-* Response example:
+* Пример ответа:
 ```json
 {
   "id": 1
 }
 ```
 
-#### 2. Authentication
-* Request example:
+#### 2. Аутентификация
+* Пример запроса:
 ```shell
 curl -X 'POST' \
   'http://localhost:8080/api/v1/auth/sign-in' \
@@ -109,30 +108,30 @@ curl -X 'POST' \
   "password": "qwerty123"
 }'
 ```
-* Response example:
+* Пример ответа:
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTMzMDc4MjksInN1YiI6IjE0In0.N1QBZb1uVZQGJ7vROHhCdlaySu1o31yjTzFLnVk_XYw"
 }
 ```
 
-#### 3. Refresh token
-* Request example:
+#### 3. Обновление токена
+* Пример запроса:
 ```shell
 curl -X 'GET' \
   'http://localhost:8080/api/v1/auth/refresh' \
   -H 'accept: application/json'
 ```
-* Response example:
+* Пример ответа:
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTMzMDc4NTIsInN1YiI6IjE0In0.cmXwc15TmNSI2mILSZjoqRhhtUN2AYZQu5had9OW07k"
 }
 ```
 
-### Agenda
-#### 1. Create Task
-* Request example:
+### TODO-лист
+#### 1. Создание задачи
+* Пример запроса:
 ```shell
 curl -X 'POST' \
   'http://localhost:8080/api/v1/agenda/create' \
@@ -146,22 +145,22 @@ curl -X 'POST' \
   "title": "Task 1"
 }'
 ```
-* Response example:
+* Пример ответа:
 ```json
 {
   "id": 1
 }
 ```
 
-#### 2. Get Task By ID
-* Request example:
+#### 2. Получение задачи по ID
+* Пример запроса:
 ```shell
 curl -X 'GET' \
   'http://localhost:8080/api/v1/agenda/1' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTU1Nzk1MzYsInN1YiI6IjIifQ.AhqXvtQPHMwp1Pv5Y9m6xXnMITUlRDnGo8oVm5DRvLU'
 ```
-* Response example:
+* Пример ответа:
 ```json
 {
    "task": {
@@ -173,15 +172,15 @@ curl -X 'GET' \
 }
 ```
 
-#### 3. Get All User Tasks
-* Request example:
+#### 3. Получение всех задач пользователя
+* Пример запроса:
 ```shell
 curl -X 'GET' \
   'http://localhost:8080/api/v1/agenda/get_all' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTU1Nzk1MzYsInN1YiI6IjIifQ.AhqXvtQPHMwp1Pv5Y9m6xXnMITUlRDnGo8oVm5DRvLU'
 ```
-* Response example:
+* Пример ответа:
 ```json
 {
   "tasks": [
@@ -201,8 +200,8 @@ curl -X 'GET' \
 }
 ```
 
-#### 4. Get All Tasks With Pagination
-* Request example:
+#### 4. Получение всех задач пользователя с пагинацией и определенным статусом
+* Пример запроса:
 ```shell
 curl -X 'GET' \
   'http://localhost:8080/api/v1/agenda/get_by_date?page=5&status=not_done' \
@@ -214,7 +213,7 @@ curl -X 'GET' \
   "offset": 2
 }'
 ```
-* Response example:
+* Пример ответа:
 ```json
 {
    "tasks": [
@@ -234,8 +233,8 @@ curl -X 'GET' \
 }
 ```
 
-#### 5. Get All Tasks By Date
-* Request example:
+#### 5. Получение всех задач по дате
+* Пример запроса:
 ```shell
 curl -X 'GET' \
   'http://localhost:8080/api/v1/agenda/get_by_date' \
@@ -248,7 +247,7 @@ curl -X 'GET' \
   "offset": 1
 }'
 ```
-* Response example:
+* Пример ответа:
 ```json
 {
    "tasks": [
@@ -274,8 +273,8 @@ curl -X 'GET' \
 }
 ```
 
-#### 6. Set Task Status
-* Request example:
+#### 6. Установить новый статус задачи
+* Пример запроса:
 ```shell
 curl -X 'PUT' \
   'http://localhost:8080/api/v1/agenda/set_status' \
@@ -287,11 +286,11 @@ curl -X 'PUT' \
   "task_id": 10
 }'
 ```
-* Response example: *None*
-> **Hint:** if the updating was successful, the server will return code 204 (NO CONTENT).
+* Пример ответа: *None*
+> **Подсказка:** если обновление прошло успешно, сервер вернет 204 код (NO CONTENT).
 
-#### 7. Delete Task By ID
-* Request example:
+#### 7. Удалить задачу по ID
+* Пример запроса:
 ```shell
 curl -X 'DELETE' \
   'http://localhost:8080/api/v1/agenda/delete_by_id' \
@@ -302,43 +301,43 @@ curl -X 'DELETE' \
   "task_id": 10
 }'
 ```
-* Response example: *None*
-> **Hint:** if the deleting was successful, the server will return code 204 (NO CONTENT).
+* Пример ответа: *None*
+> **Подсказка:** если удаление прошло успешно, сервер вернет 204 код (NO CONTENT).
 
-#### 8. Delete All User Tasks
-* Request example:
+#### 8. Удалить все задачи пользователя
+* Пример запроса:
 ```shell
 curl -X 'DELETE' \
   'http://localhost:8080/api/v1/agenda/delete_all' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTU1Nzk1MzYsInN1YiI6IjIifQ.AhqXvtQPHMwp1Pv5Y9m6xXnMITUlRDnGo8oVm5DRvLU'
 ```
-* Response example: *None*
-> **Hint:** if the deleting was successful, the server will return code 204 (NO CONTENT).
+* Пример ответа: *None*
+> **Подсказка:** если удаление прошло успешно, сервер вернет 204 код (NO CONTENT).
 
 ---
 
-## Additional features
-1. **Run tests**
+## Дополнительные возможности
+1. **Запуск тестов**
 ```shell
 make test
 ```
-2. **Run the linter**
+2. **Запуск линтера**
 ```shell
 make lint
 ```
-3. **Create migration files**
+3. **Создание файлов миграций**
 ```shell
 make migrate-create
 ```
-4. **Migrations up / down**
+4. **Миграции вверх / вниз**
 ```shell
 make migrate-up
 ```
 ```shell
 make migrate-down
 ```
-5. **Stop all running containers**
+5. **Остановка всех запущенных контейнеров**
 ```shell
 make stop
 ```

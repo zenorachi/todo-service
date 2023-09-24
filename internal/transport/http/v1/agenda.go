@@ -40,6 +40,7 @@ type createTaskResponse struct {
 }
 
 // @Summary Create task
+// @Security Bearer
 // @Description create task
 // @Tags agenda
 // @Accept json

@@ -10,7 +10,7 @@ import (
 )
 
 func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
-	users := api.Group("/users")
+	users := api.Group("/auth")
 	{
 		users.POST("/sign-up", h.signUp)
 		users.POST("/sign-in", h.signIn)
@@ -38,7 +38,7 @@ type signUpResponse struct {
 // @Failure 400 {object} errorResponse
 // @Failure 409 {object} errorResponse
 // @Failure 500 {object} errorResponse
-// @Router /api/v1/users/sign-up [post]
+// @Router /api/v1/auth/sign-up [post]
 func (h *Handler) signUp(c *gin.Context) {
 	var input signUpInput
 	if err := c.BindJSON(&input); err != nil {
@@ -77,7 +77,7 @@ type tokenResponse struct {
 // @Success 200 {object} tokenResponse
 // @Failure 400 {object} errorResponse
 // @Failure 500 {object} errorResponse
-// @Router /api/v1/users/sign-in [post]
+// @Router /api/v1/auth/sign-in [post]
 func (h *Handler) signIn(c *gin.Context) {
 	var input signInInput
 	if err := c.BindJSON(&input); err != nil {
@@ -107,7 +107,7 @@ func (h *Handler) signIn(c *gin.Context) {
 // @Success 200 {object} tokenResponse
 // @Failure 400 {object} errorResponse
 // @Failure 500 {object} errorResponse
-// @Router /api/v1/users/refresh [get]
+// @Router /api/v1/auth/refresh [get]
 func (h *Handler) refresh(c *gin.Context) {
 	refreshToken, err := c.Cookie("refresh-token")
 	if err != nil {
