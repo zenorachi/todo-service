@@ -11,6 +11,7 @@ services:
       - .env
     volumes:
       - ./scripts:/root/scripts
+      - ./docs:/root/docs
     depends_on:
       - postgres
     networks:

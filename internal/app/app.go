@@ -1,6 +1,7 @@
 package app
 
 import (
+	_ "github.com/zenorachi/todo-service/docs/swagger"
 	"github.com/zenorachi/todo-service/internal/config"
 	"github.com/zenorachi/todo-service/internal/database"
 	"github.com/zenorachi/todo-service/internal/repository"
@@ -15,6 +16,21 @@ import (
 	"os/signal"
 	"syscall"
 )
+
+// @title           			TO-DO service
+// @version         			1.0
+// @description     			This is a service that implements the functions of a daily planner
+
+// @contact.name   				Maksim Sonkin
+// @contact.email  				msonkin33@gmail.com
+
+// @host      					localhost:8080
+// @BasePath  					/
+
+// @securityDefinitions.apikey  Bearer
+// @in 						    header
+// @name 					    Authorization
+// @description					Type "Bearer" followed by a space and JWT token.
 
 func Run(cfg *config.Config) {
 	/* DO MIGRATIONS */

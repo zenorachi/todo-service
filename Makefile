@@ -34,7 +34,10 @@ migrate-up:
 migrate-down:
 	migrate -path $(MIGRATION_DIR) -database $(POSTGRES_URL) down
 
+swag:
+	 swag init -g internal/app/app.go -o ./docs/swagger/
+
 clean:
 	rm -rf ./.bin cover.out
 
-.PHONY: build run rebuild up-postgres stop migrate-create migrate-down migrate-up clean
+.PHONY: build run rebuild up-postgres stop migrate-create migrate-down migrate-up swag clean
