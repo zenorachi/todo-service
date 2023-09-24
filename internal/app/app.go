@@ -1,7 +1,7 @@
 package app
 
 import (
-	_ "github.com/zenorachi/todo-service/docs/swagger"
+	_ "github.com/zenorachi/todo-service/docs"
 	"github.com/zenorachi/todo-service/internal/config"
 	"github.com/zenorachi/todo-service/internal/database"
 	"github.com/zenorachi/todo-service/internal/repository"
