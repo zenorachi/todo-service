@@ -107,7 +107,8 @@ func TestAgendaRepository_GetByID(t *testing.T) {
 	}
 
 	type args struct {
-		id int
+		id     int
+		userId int
 	}
 	type mockBehaviour func(args args)
 
@@ -129,8 +130,8 @@ func TestAgendaRepository_GetByID(t *testing.T) {
 				rows := sqlmock.NewRows([]string{"title", "description", "date", "status"}).
 					AddRow(testTask.Title, testTask.Description, testTask.Date, testTask.Status)
 
-				expectedQuery := "SELECT title, description, date, status FROM agenda WHERE id = $1"
-				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.id).WillReturnRows(rows)
+				expectedQuery := "SELECT title, description, date, status FROM agenda WHERE id = $1 AND user_id = $2"
+				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.id, args.userId).WillReturnRows(rows)
 
 				mock.ExpectCommit()
 			},
@@ -144,8 +145,8 @@ func TestAgendaRepository_GetByID(t *testing.T) {
 			mockBehaviour: func(args args) {
 				mock.ExpectBegin()
 
-				expectedQuery := "SELECT title, description, date, status FROM agenda WHERE id = $1"
-				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.id).
+				expectedQuery := "SELECT title, description, date, status FROM agenda WHERE id = $1 AND user_id = $2"
+				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.id, args.userId).
 					WillReturnError(errors.New("test error"))
 
 				mock.ExpectRollback()
@@ -158,7 +159,7 @@ func TestAgendaRepository_GetByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockBehaviour(tt.args)
-			task, err := repo.GetByID(context.Background(), tt.args.id)
+			task, err := repo.GetByID(context.Background(), tt.args.id, tt.args.userId)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -188,7 +189,8 @@ func TestAgendaRepository_GetByTitle(t *testing.T) {
 	}
 
 	type args struct {
-		title string
+		title  string
+		userId int
 	}
 	type mockBehaviour func(args args)
 
@@ -210,8 +212,8 @@ func TestAgendaRepository_GetByTitle(t *testing.T) {
 				rows := sqlmock.NewRows([]string{"title", "description", "date", "status"}).
 					AddRow(testTask.Title, testTask.Description, testTask.Date, testTask.Status)
 
-				expectedQuery := "SELECT title, description, date, status FROM agenda WHERE title = $1"
-				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.title).WillReturnRows(rows)
+				expectedQuery := "SELECT title, description, date, status FROM agenda WHERE title = $1 AND user_id = $2"
+				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.title, args.userId).WillReturnRows(rows)
 
 				mock.ExpectCommit()
 			},
@@ -225,8 +227,8 @@ func TestAgendaRepository_GetByTitle(t *testing.T) {
 			mockBehaviour: func(args args) {
 				mock.ExpectBegin()
 
-				expectedQuery := "SELECT title, description, date, status FROM agenda WHERE title = $1"
-				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.title).
+				expectedQuery := "SELECT title, description, date, status FROM agenda WHERE title = $1 AND user_id = $2"
+				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.title, args.userId).
 					WillReturnError(errors.New("test error"))
 
 				mock.ExpectRollback()
@@ -239,7 +241,7 @@ func TestAgendaRepository_GetByTitle(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockBehaviour(tt.args)
-			task, err := repo.GetByTitle(context.Background(), tt.args.title)
+			task, err := repo.GetByTitleAndUserID(context.Background(), tt.args.title, tt.args.userId)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -262,6 +264,7 @@ func TestAgendaRepository_SetStatus(t *testing.T) {
 
 	type args struct {
 		id     int
+		userId int
 		status string
 	}
 	type mockBehaviour func(args args)
@@ -281,9 +284,9 @@ func TestAgendaRepository_SetStatus(t *testing.T) {
 			mockBehaviour: func(args args) {
 				mock.ExpectBegin()
 
-				expectedQuery := "UPDATE agenda SET status = $1 WHERE id = $2"
+				expectedQuery := "UPDATE agenda SET status = $1 WHERE id = $2 AND user_id = $3"
 				mock.ExpectExec(regexp.QuoteMeta(expectedQuery)).
-					WithArgs(args.status, args.id).
+					WithArgs(args.status, args.id, args.userId).
 					WillReturnResult(sqlmock.NewResult(0, 1))
 
 				mock.ExpectCommit()
@@ -298,9 +301,9 @@ func TestAgendaRepository_SetStatus(t *testing.T) {
 			mockBehaviour: func(args args) {
 				mock.ExpectBegin()
 
-				expectedQuery := "UPDATE agenda SET status = $1 WHERE id = $2"
+				expectedQuery := "UPDATE agenda SET status = $1 WHERE id = $2 AND user_id = $3"
 				mock.ExpectExec(regexp.QuoteMeta(expectedQuery)).
-					WithArgs(args.status, args.id).
+					WithArgs(args.status, args.id, args.userId).
 					WillReturnError(errors.New("test error"))
 
 				mock.ExpectRollback()
@@ -312,7 +315,7 @@ func TestAgendaRepository_SetStatus(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockBehaviour(tt.args)
-			err := repo.SetStatus(context.Background(), tt.args.id, tt.args.status)
+			err := repo.SetStatus(context.Background(), tt.args.id, tt.args.userId, tt.args.status)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -333,7 +336,8 @@ func TestAgendaRepository_DeleteByID(t *testing.T) {
 	repo := NewAgenda(db)
 
 	type args struct {
-		id int
+		id     int
+		userId int
 	}
 	type mockBehaviour func(args args)
 
@@ -351,9 +355,9 @@ func TestAgendaRepository_DeleteByID(t *testing.T) {
 			mockBehaviour: func(args args) {
 				mock.ExpectBegin()
 
-				expectedQuery := "DELETE FROM agenda WHERE id = $1"
+				expectedQuery := "DELETE FROM agenda WHERE id = $1 AND user_id = $2"
 				mock.ExpectExec(regexp.QuoteMeta(expectedQuery)).
-					WithArgs(args.id).
+					WithArgs(args.id, args.userId).
 					WillReturnResult(sqlmock.NewResult(0, 1))
 
 				mock.ExpectCommit()
@@ -367,9 +371,9 @@ func TestAgendaRepository_DeleteByID(t *testing.T) {
 			mockBehaviour: func(args args) {
 				mock.ExpectBegin()
 
-				expectedQuery := "DELETE FROM agenda WHERE id = $1"
+				expectedQuery := "DELETE FROM agenda WHERE id = $1 AND user_id = $2"
 				mock.ExpectExec(regexp.QuoteMeta(expectedQuery)).
-					WithArgs(args.id).
+					WithArgs(args.id, args.userId).
 					WillReturnError(errors.New("test error"))
 
 				mock.ExpectRollback()
@@ -381,7 +385,7 @@ func TestAgendaRepository_DeleteByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockBehaviour(tt.args)
-			err := repo.DeleteByID(context.Background(), tt.args.id)
+			err := repo.DeleteByID(context.Background(), tt.args.id, tt.args.userId)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -490,10 +494,10 @@ func TestAgendaRepository_GetByUserID(t *testing.T) {
 			mockBehaviour: func(args args) {
 				mock.ExpectBegin()
 
-				expectedQuery := "SELECT title, description, date, status FROM agenda WHERE user_id = $1"
-				rows := sqlmock.NewRows([]string{"title", "description", "date", "status"}).
-					AddRow("Task 1", "Description 1", time.Now().Round(time.Second), "done").
-					AddRow("Task 2", "Description 2", time.Now().Round(time.Second), "not done")
+				expectedQuery := "SELECT id, title, description, date, status FROM agenda WHERE user_id = $1"
+				rows := sqlmock.NewRows([]string{"id", "title", "description", "date", "status"}).
+					AddRow(0, "Task 1", "Description 1", time.Now().Round(time.Second), "done").
+					AddRow(0, "Task 2", "Description 2", time.Now().Round(time.Second), "not done")
 
 				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
 					WithArgs(args.userID).
@@ -524,7 +528,7 @@ func TestAgendaRepository_GetByUserID(t *testing.T) {
 			mockBehaviour: func(args args) {
 				mock.ExpectBegin()
 
-				expectedQuery := "SELECT title, description, date, status FROM agenda WHERE user_id = $1"
+				expectedQuery := "SELECT id, title, description, date, status FROM agenda WHERE user_id = $1"
 				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
 					WithArgs(args.userID).
 					WillReturnError(errors.New("test error"))
@@ -587,10 +591,10 @@ func TestAgendaRepository_GetByDateAndStatus(t *testing.T) {
 			mockBehaviour: func(args args) {
 				mock.ExpectBegin()
 
-				expectedQuery := "SELECT title, description, date, status FROM agenda WHERE user_id = $1 AND status = $2 AND DATE(date) = $3 LIMIT $4 OFFSET $5"
-				rows := sqlmock.NewRows([]string{"title", "description", "date", "status"}).
-					AddRow("Task 1", "Description 1", time.Now().Round(time.Second), "done").
-					AddRow("Task 2", "Description 2", time.Now().Round(time.Second), "done")
+				expectedQuery := "SELECT id, title, description, date, status FROM agenda WHERE user_id = $1 AND status = $2 AND DATE(date) = $3 LIMIT $4 OFFSET $5"
+				rows := sqlmock.NewRows([]string{"id", "title", "description", "date", "status"}).
+					AddRow(0, "Task 1", "Description 1", time.Now().Round(time.Second), "done").
+					AddRow(0, "Task 2", "Description 2", time.Now().Round(time.Second), "done")
 
 				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
 					WithArgs(args.userID, args.status, args.date, args.limit, args.offset).
@@ -625,10 +629,10 @@ func TestAgendaRepository_GetByDateAndStatus(t *testing.T) {
 			mockBehaviour: func(args args) {
 				mock.ExpectBegin()
 
-				expectedQuery := "SELECT title, description, date, status FROM agenda WHERE user_id = $1 AND status = $2 LIMIT $3 OFFSET $4"
-				rows := sqlmock.NewRows([]string{"title", "description", "date", "status"}).
-					AddRow("Task 1", "Description 1", time.Time{}, "done").
-					AddRow("Task 2", "Description 2", time.Time{}, "done")
+				expectedQuery := "SELECT id, title, description, date, status FROM agenda WHERE user_id = $1 AND status = $2 LIMIT $3 OFFSET $4"
+				rows := sqlmock.NewRows([]string{"id", "title", "description", "date", "status"}).
+					AddRow(0, "Task 1", "Description 1", time.Time{}, "done").
+					AddRow(0, "Task 2", "Description 2", time.Time{}, "done")
 
 				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
 					WithArgs(args.userID, args.status, args.limit, args.offset).
@@ -663,7 +667,7 @@ func TestAgendaRepository_GetByDateAndStatus(t *testing.T) {
 			mockBehaviour: func(args args) {
 				mock.ExpectBegin()
 
-				expectedQuery := "SELECT title, description, date, status FROM agenda WHERE user_id = $1 AND status = $2 AND DATE(date) = $3 LIMIT $4 OFFSET $5"
+				expectedQuery := "SELECT id, title, description, date, status FROM agenda WHERE user_id = $1 AND status = $2 AND DATE(date) = $3 LIMIT $4 OFFSET $5"
 				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
 					WithArgs(args.userID, args.status, args.date, args.limit, args.offset).
 					WillReturnError(errors.New("test error"))

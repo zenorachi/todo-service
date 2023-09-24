@@ -185,12 +185,14 @@ curl -X 'GET' \
 {
   "tasks": [
       {
+         "id": 1,
          "title": "Task 1",
          "description": "Description",
          "date": "2023-09-26T00:00:00Z",
          "status": "not done"
       },
       {
+         "id": 2,
          "title": "Task 2",
          "description": "Description",
          "date": "2023-09-26T00:00:00Z",
@@ -218,12 +220,14 @@ curl -X 'GET' \
 {
    "tasks": [
       {
+         "id": 1,
          "title": "some task2",
          "description": "desc",
          "date": "2023-09-26T00:00:00Z",
          "status": "not done"
       },
       {
+         "id": 2,
          "title": "some task3",
          "description": "desc",
          "date": "2023-09-26T00:00:00Z",
@@ -252,18 +256,21 @@ curl -X 'GET' \
 {
    "tasks": [
       {
+         "id": 1,
          "title": "some task1",
          "description": "desc",
          "date": "2023-09-26T00:00:00Z",
          "status": "not done"
       },
       {
+         "id": 2,
          "title": "some task2",
          "description": "desc",
          "date": "2023-09-26T00:00:00Z",
          "status": "not done"
       },
       {
+         "id": 3,
          "title": "some task3",
          "description": "desc",
          "date": "2023-09-26T00:00:00Z",

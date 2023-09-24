@@ -8,6 +8,7 @@ const (
 )
 
 type Task struct {
+	ID          int       `json:"id,omitempty"`
 	UserID      int       `json:"user_id,omitempty"`
 	Title       string    `json:"title,omitempty"`
 	Description string    `json:"description,omitempty"`

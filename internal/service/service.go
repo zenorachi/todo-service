@@ -30,9 +30,9 @@ type (
 
 	Agenda interface {
 		CreateTask(ctx context.Context, task entity.Task) (int, error)
-		GetTaskByID(ctx context.Context, id int) (entity.Task, error)
-		SetTaskStatus(ctx context.Context, id int, status string) error
-		DeleteTaskByID(ctx context.Context, id int) error
+		GetTaskByID(ctx context.Context, id, userId int) (entity.Task, error)
+		SetTaskStatus(ctx context.Context, id, userId int, status string) error
+		DeleteTaskByID(ctx context.Context, id, userId int) error
 		DeleteUserTasks(ctx context.Context, userId int) error
 		GetUserTasks(ctx context.Context, userId int) ([]entity.Task, error)
 		GetByDateAndStatus(ctx context.Context, userId int, status string, date time.Time, limit, offset int) ([]entity.Task, error)

@@ -110,7 +110,7 @@ func (h *Handler) getTaskByID(c *gin.Context) {
 		return
 	}
 
-	task, err := h.services.Agenda.GetTaskByID(c, id)
+	task, err := h.services.Agenda.GetTaskByID(c, id, c.GetInt(userCtx))
 	if err != nil {
 		if errors.Is(err, entity.ErrTaskDoesNotExist) {
 			newErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -147,7 +147,7 @@ func (h *Handler) setTaskStatus(c *gin.Context) {
 		return
 	}
 
-	err := h.services.Agenda.SetTaskStatus(c, input.ID, input.Status)
+	err := h.services.Agenda.SetTaskStatus(c, input.ID, c.GetInt(userCtx), input.Status)
 	if err != nil {
 		if errors.Is(err, entity.ErrTaskDoesNotExist) || errors.Is(err, entity.ErrInvalidStatus) {
 			newErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -183,7 +183,7 @@ func (h *Handler) deleteTaskByID(c *gin.Context) {
 		return
 	}
 
-	err := h.services.Agenda.DeleteTaskByID(c, input.ID)
+	err := h.services.Agenda.DeleteTaskByID(c, input.ID, c.GetInt(userCtx))
 	if err != nil {
 		if errors.Is(err, entity.ErrTaskDoesNotExist) {
 			newErrorResponse(c, http.StatusBadRequest, err.Error())

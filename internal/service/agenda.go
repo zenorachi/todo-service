@@ -19,7 +19,7 @@ func NewAgenda(repo repository.Agenda) *AgendaService {
 }
 
 func (a *AgendaService) CreateTask(ctx context.Context, task entity.Task) (int, error) {
-	if a.isTaskExists(ctx, task.Title) {
+	if a.isTaskExists(ctx, task.Title, task.UserID) {
 		return 0, entity.ErrTaskAlreadyExist
 	}
 
@@ -34,8 +34,8 @@ func (a *AgendaService) CreateTask(ctx context.Context, task entity.Task) (int, 
 	return a.repo.Create(ctx, task)
 }
 
-func (a *AgendaService) GetTaskByID(ctx context.Context, id int) (entity.Task, error) {
-	task, err := a.repo.GetByID(ctx, id)
+func (a *AgendaService) GetTaskByID(ctx context.Context, id, userId int) (entity.Task, error) {
+	task, err := a.repo.GetByID(ctx, id, userId)
 	if errors.Is(err, sql.ErrNoRows) {
 		return entity.Task{}, entity.ErrTaskDoesNotExist
 	}
@@ -46,8 +46,8 @@ func (a *AgendaService) GetTaskByID(ctx context.Context, id int) (entity.Task, e
 	return task, nil
 }
 
-func (a *AgendaService) SetTaskStatus(ctx context.Context, id int, status string) error {
-	if !a.isTaskExists(ctx, id) {
+func (a *AgendaService) SetTaskStatus(ctx context.Context, id, userId int, status string) error {
+	if !a.isTaskExists(ctx, id, userId) {
 		return entity.ErrTaskDoesNotExist
 	}
 
@@ -55,15 +55,15 @@ func (a *AgendaService) SetTaskStatus(ctx context.Context, id int, status string
 		return entity.ErrInvalidStatus
 	}
 
-	return a.repo.SetStatus(ctx, id, status)
+	return a.repo.SetStatus(ctx, id, userId, status)
 }
 
-func (a *AgendaService) DeleteTaskByID(ctx context.Context, id int) error {
-	if !a.isTaskExists(ctx, id) {
+func (a *AgendaService) DeleteTaskByID(ctx context.Context, id, userId int) error {
+	if !a.isTaskExists(ctx, id, userId) {
 		return entity.ErrTaskDoesNotExist
 	}
 
-	return a.repo.DeleteByID(ctx, id)
+	return a.repo.DeleteByID(ctx, id, userId)
 }
 
 func (a *AgendaService) DeleteUserTasks(ctx context.Context, userId int) error {
@@ -90,14 +90,14 @@ func (a *AgendaService) GetByDateAndStatus(ctx context.Context, userId int, stat
 	return a.repo.GetByDateAndStatus(ctx, userId, status, date, limit, offset)
 }
 
-func (a *AgendaService) isTaskExists(ctx context.Context, data any) bool {
+func (a *AgendaService) isTaskExists(ctx context.Context, data any, userId int) bool {
 	var task entity.Task
 
 	switch data.(type) {
 	case string:
-		task, _ = a.repo.GetByTitle(ctx, data.(string))
+		task, _ = a.repo.GetByTitleAndUserID(ctx, data.(string), userId)
 	case int:
-		task, _ = a.repo.GetByID(ctx, data.(int))
+		task, _ = a.repo.GetByID(ctx, data.(int), userId)
 	}
 
 	return len(task.Title) != 0

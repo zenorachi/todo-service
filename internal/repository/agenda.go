@@ -41,7 +41,7 @@ func (a *AgendaRepository) Create(ctx context.Context, task entity.Task) (int, e
 	return id, tx.Commit()
 }
 
-func (a *AgendaRepository) GetByID(ctx context.Context, id int) (entity.Task, error) {
+func (a *AgendaRepository) GetByID(ctx context.Context, id int, userId int) (entity.Task, error) {
 	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelRepeatableRead,
 		ReadOnly:  true,
@@ -53,11 +53,11 @@ func (a *AgendaRepository) GetByID(ctx context.Context, id int) (entity.Task, er
 
 	var (
 		task  entity.Task
-		query = fmt.Sprintf("SELECT title, description, date, status FROM %s WHERE id = $1",
+		query = fmt.Sprintf("SELECT title, description, date, status FROM %s WHERE id = $1 AND user_id = $2",
 			collectionAgenda)
 	)
 
-	err = tx.QueryRowContext(ctx, query, id).
+	err = tx.QueryRowContext(ctx, query, id, userId).
 		Scan(&task.Title, &task.Description, &task.Date, &task.Status)
 	if err != nil {
 		return entity.Task{}, err
@@ -66,7 +66,7 @@ func (a *AgendaRepository) GetByID(ctx context.Context, id int) (entity.Task, er
 	return task, tx.Commit()
 }
 
-func (a *AgendaRepository) GetByTitle(ctx context.Context, title string) (entity.Task, error) {
+func (a *AgendaRepository) GetByTitleAndUserID(ctx context.Context, title string, userId int) (entity.Task, error) {
 	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelRepeatableRead,
 		ReadOnly:  true,
@@ -78,11 +78,11 @@ func (a *AgendaRepository) GetByTitle(ctx context.Context, title string) (entity
 
 	var (
 		task  entity.Task
-		query = fmt.Sprintf("SELECT title, description, date, status FROM %s WHERE title = $1",
+		query = fmt.Sprintf("SELECT title, description, date, status FROM %s WHERE title = $1 AND user_id = $2",
 			collectionAgenda)
 	)
 
-	err = tx.QueryRowContext(ctx, query, title).
+	err = tx.QueryRowContext(ctx, query, title, userId).
 		Scan(&task.Title, &task.Description, &task.Date, &task.Status)
 	if err != nil {
 		return entity.Task{}, err
@@ -91,7 +91,7 @@ func (a *AgendaRepository) GetByTitle(ctx context.Context, title string) (entity
 	return task, tx.Commit()
 }
 
-func (a *AgendaRepository) SetStatus(ctx context.Context, id int, status string) error {
+func (a *AgendaRepository) SetStatus(ctx context.Context, id int, userId int, status string) error {
 	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelSerializable,
 		ReadOnly:  false,
@@ -101,10 +101,10 @@ func (a *AgendaRepository) SetStatus(ctx context.Context, id int, status string)
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	query := fmt.Sprintf("UPDATE %s SET status = $1 WHERE id = $2",
+	query := fmt.Sprintf("UPDATE %s SET status = $1 WHERE id = $2 AND user_id = $3",
 		collectionAgenda)
 
-	_, err = tx.ExecContext(ctx, query, status, id)
+	_, err = tx.ExecContext(ctx, query, status, id, userId)
 	if err != nil {
 		return err
 	}
@@ -112,7 +112,7 @@ func (a *AgendaRepository) SetStatus(ctx context.Context, id int, status string)
 	return tx.Commit()
 }
 
-func (a *AgendaRepository) DeleteByID(ctx context.Context, id int) error {
+func (a *AgendaRepository) DeleteByID(ctx context.Context, id int, userId int) error {
 	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelSerializable,
 		ReadOnly:  false,
@@ -122,9 +122,9 @@ func (a *AgendaRepository) DeleteByID(ctx context.Context, id int) error {
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	var query = fmt.Sprintf("DELETE FROM %s WHERE id = $1", collectionAgenda)
+	var query = fmt.Sprintf("DELETE FROM %s WHERE id = $1 AND user_id = $2", collectionAgenda)
 
-	_, err = tx.ExecContext(ctx, query, id)
+	_, err = tx.ExecContext(ctx, query, id, userId)
 	if err != nil {
 		return err
 	}
@@ -164,7 +164,7 @@ func (a *AgendaRepository) GetByUserID(ctx context.Context, userId int) ([]entit
 
 	var (
 		tasks []entity.Task
-		query = fmt.Sprintf("SELECT title, description, date, status FROM %s WHERE user_id = $1",
+		query = fmt.Sprintf("SELECT id, title, description, date, status FROM %s WHERE user_id = $1",
 			collectionAgenda)
 	)
 
@@ -176,7 +176,7 @@ func (a *AgendaRepository) GetByUserID(ctx context.Context, userId int) ([]entit
 
 	for rows.Next() {
 		var task entity.Task
-		if err = rows.Scan(&task.Title, &task.Description, &task.Date, &task.Status); err != nil {
+		if err = rows.Scan(&task.ID, &task.Title, &task.Description, &task.Date, &task.Status); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)
@@ -207,12 +207,12 @@ func (a *AgendaRepository) GetByDateAndStatus(ctx context.Context, userId int, s
 
 	if date.Equal(time.Time{}) {
 		query = fmt.Sprintf(
-			"SELECT title, description, date, status FROM %s WHERE user_id = $1 AND status = $2 LIMIT $3 OFFSET $4",
+			"SELECT id, title, description, date, status FROM %s WHERE user_id = $1 AND status = $2 LIMIT $3 OFFSET $4",
 			collectionAgenda)
 		rows, err = tx.QueryContext(ctx, query, userId, status, limit, offset)
 	} else {
 		query = fmt.Sprintf(
-			"SELECT title, description, date, status FROM %s WHERE user_id = $1 AND status = $2 AND DATE(date) = $3 LIMIT $4 OFFSET $5",
+			"SELECT id, title, description, date, status FROM %s WHERE user_id = $1 AND status = $2 AND DATE(date) = $3 LIMIT $4 OFFSET $5",
 			collectionAgenda)
 		rows, err = tx.QueryContext(ctx, query, userId, status, date, limit, offset)
 	}
@@ -224,7 +224,7 @@ func (a *AgendaRepository) GetByDateAndStatus(ctx context.Context, userId int, s
 
 	for rows.Next() {
 		var task entity.Task
-		if err = rows.Scan(&task.Title, &task.Description, &task.Date, &task.Status); err != nil {
+		if err = rows.Scan(&task.ID, &task.Title, &task.Description, &task.Date, &task.Status); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)
