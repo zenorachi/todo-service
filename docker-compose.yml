@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  app:
+    container_name: todo-app
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - ./scripts:/root/scripts
+      - ./docs:/root/docs
+    depends_on:
+      - postgres
+    networks:
+      - dus-backend
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    ports:
+      - "${LOCAL_DB_PORT}:${DB_PORT}"
+    env_file:
+      - .env
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    restart: on-failure
+    networks:
+      - dus-backend
+
+networks:
+  dus-backend:
+    driver: bridge
+
+volumes:
+  pg-data:

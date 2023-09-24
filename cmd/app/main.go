@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
+	"github.com/zenorachi/todo-service/internal/app"
 	"github.com/zenorachi/todo-service/internal/config"
 )
 
 func main() {
-	fmt.Println(config.New())
+	app.Run(config.New())
 }
