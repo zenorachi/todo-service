@@ -207,7 +207,7 @@ curl -X 'GET' \
 * Request example:
 ```shell
 curl -X 'GET' \
-  'http://localhost:8080/api/v1/agenda/get_by_date?page=5&status=not_done' \
+  'http://localhost:8080/api/v1/agenda/get_by_date?page=5&status=done' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTU1Nzk1MzYsInN1YiI6IjIifQ.AhqXvtQPHMwp1Pv5Y9m6xXnMITUlRDnGo8oVm5DRvLU' \
   -H 'Content-Type: application/json' \
@@ -225,18 +225,19 @@ curl -X 'GET' \
          "title": "some task2",
          "description": "desc",
          "date": "2023-09-26T00:00:00Z",
-         "status": "not done"
+         "status": "done"
       },
       {
          "id": 2,
          "title": "some task3",
          "description": "desc",
          "date": "2023-09-26T00:00:00Z",
-         "status": "not done"
+         "status": "done"
       }
    ]
 }
 ```
+> **Hint:** by default, the status is set to "not done".
 
 #### 5. Get all tasks by date
 * Request example:
