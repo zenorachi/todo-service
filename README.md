@@ -131,7 +131,7 @@ curl -X 'GET' \
 ```
 
 ### Agenda
-#### 1. Create Task
+#### 1. Create task
 * Request example:
 ```shell
 curl -X 'POST' \
@@ -153,7 +153,7 @@ curl -X 'POST' \
 }
 ```
 
-#### 2. Get Task By ID
+#### 2. Get task by ID
 * Request example:
 ```shell
 curl -X 'GET' \
@@ -173,7 +173,7 @@ curl -X 'GET' \
 }
 ```
 
-#### 3. Get All User Tasks
+#### 3. Get all user tasks
 * Request example:
 ```shell
 curl -X 'GET' \
@@ -203,7 +203,7 @@ curl -X 'GET' \
 }
 ```
 
-#### 4. Get All Tasks With Pagination
+#### 4. Get all tasks with pagination and specific status
 * Request example:
 ```shell
 curl -X 'GET' \
@@ -238,7 +238,7 @@ curl -X 'GET' \
 }
 ```
 
-#### 5. Get All Tasks By Date
+#### 5. Get all tasks by date
 * Request example:
 ```shell
 curl -X 'GET' \
@@ -281,7 +281,7 @@ curl -X 'GET' \
 }
 ```
 
-#### 6. Set Task Status
+#### 6. Set task status
 * Request example:
 ```shell
 curl -X 'PUT' \
@@ -297,7 +297,7 @@ curl -X 'PUT' \
 * Response example: *None*
 > **Hint:** if the updating was successful, the server will return code 204 (NO CONTENT).
 
-#### 7. Delete Task By ID
+#### 7. Delete task by ID
 * Request example:
 ```shell
 curl -X 'DELETE' \
@@ -312,7 +312,7 @@ curl -X 'DELETE' \
 * Response example: *None*
 > **Hint:** if the deleting was successful, the server will return code 204 (NO CONTENT).
 
-#### 8. Delete All User Tasks
+#### 8. Delete all user tasks
 * Request example:
 ```shell
 curl -X 'DELETE' \

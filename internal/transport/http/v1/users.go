@@ -18,6 +18,8 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 	}
 }
 
+/* --- REGISTRATION --- */
+
 type signUpInput struct {
 	Login    string `json:"login"    binding:"required,min=2,max=64"`
 	Email    string `json:"email"    binding:"required,email,max=64"`
@@ -59,6 +61,8 @@ func (h *Handler) signUp(c *gin.Context) {
 	newResponse(c, http.StatusCreated, signUpResponse{ID: id})
 }
 
+/* --- AUTHENTICATION --- */
+
 type signInInput struct {
 	Login    string `json:"login"    binding:"required,min=2,max=64"`
 	Password string `json:"password" binding:"required,min=6,max=64"`
@@ -98,6 +102,8 @@ func (h *Handler) signIn(c *gin.Context) {
 	c.Header("Set-Cookie", fmt.Sprintf("refresh-token=%s; HttpOnly", tokens.RefreshToken))
 	newResponse(c, http.StatusOK, tokenResponse{Token: tokens.AccessToken})
 }
+
+/* --- REFRESH TOKEN --- */
 
 // @Summary User Refresh Token
 // @Description refresh user's access token
