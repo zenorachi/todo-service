@@ -1,11 +1,13 @@
 -- USER'S SESSION --
-CREATE TYPE session_type AS (
+CREATE TYPE IF NOT EXISTS
+session_type AS (
     refresh_token   VARCHAR(255),
     expires_at      TIMESTAMP
 );
 
 -- USERS --
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS 
+users (
     id              SERIAL PRIMARY KEY,
     login           VARCHAR(255) UNIQUE NOT NULL,
     email           VARCHAR(255) UNIQUE NOT NULL,
@@ -15,12 +17,14 @@ CREATE TABLE users (
 );
 
 -- TASK TYPE --
-CREATE TYPE task_type AS ENUM (
+CREATE TYPE IF NOT EXISTS
+task_type AS ENUM (
     'done', 'not done'
 );
 
 -- TO-DO LIST --
-CREATE TABLE agenda (
+CREATE TABLE IF NOT EXISTS
+agenda (
     id              SERIAL PRIMARY KEY,
     user_id         INT NOT NULL,
     title           VARCHAR(255) NOT NULL,
